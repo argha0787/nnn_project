@@ -1,0 +1,22 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: py data_ingestion.py
+    deps:
+    - path: data/raw/ssd.csv
+      hash: md5
+      md5: a5764327ac1459eb4d4dc73539a60d2e
+      size: 57260
+    - path: data_ingestion.py
+      hash: md5
+      md5: 6d7be2a93c79dbe34aea4bd2729a2d1e
+      size: 1468
+    params:
+      params.yaml:
+        data.ingested_path: data/ingested/ssd.csv
+        data.raw_path: data/raw/ssd.csv
+    outs:
+    - path: data/ingested/ssd.csv
+      hash: md5
+      md5: a5764327ac1459eb4d4dc73539a60d2e
+      size: 57260

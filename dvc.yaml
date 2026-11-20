@@ -1,0 +1,25 @@
+
+stages:
+
+  data_ingestion:
+    cmd: py data_ingestion.py
+    deps:
+      - data_ingestion.py
+      - data/raw/ssd.csv
+    params:
+      - data.raw_path
+      - data.ingested_path
+    outs:
+      - data/ingested/ssd.csv
+
+  model_training:
+    cmd: py train.py
+    deps:
+      - train.py
+      - data/feature_selected/feature_selected.csv
+    params:
+      - data.target_column
+      - training
+      - model
+    outs:
+      - models/best_model.pkl
