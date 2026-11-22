@@ -7,8 +7,8 @@ import os
 from prometheus_client import Counter, Histogram, make_asgi_app
 import time
 
-app= FastAPI('Insurence App')
-model= joblib.load(Path(__file__).resolve().parents[1]/'models'/'best_model.pkl')
+app= FastAPI(title ='Insurence App')
+model= joblib.load(Path(__file__).resolve().parents[1]/'models'/'best_models.pkl')
 
 class Info(BaseModel):
     age: int
@@ -24,7 +24,7 @@ REQUEST_COUNT= Counter(
     'Total number of '
 )
 PREDICTION_COUNT= Counter(
-    'predictions_total'
+    'predictions_total',
     'total number of predictions'
 )
 ERROR_COUNT= Counter(

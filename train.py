@@ -19,8 +19,8 @@ logging.basicConfig(level= logging.INFO,
 
 logger= logging.getLogger()
 
-df= pd.read_csv('../data/raw/ssd.csv')
-X= df.drop('expenses', 'Unnamed: 0')
+df= pd.read_csv('data/raw/ssd.csv')
+X= df.drop('expenses', axis= 1)
 
 y= df['expenses']
 X_train, X_test, y_train, y_test= train_test_split(X,y, test_size=0.2, random_state= 42)
@@ -49,8 +49,8 @@ best_mdoel= None
 best_model_name= None
 best_rmse= float('inf')
 
+mlflow.set_tracking_uri('http://127.0.0.1:5000')
 mlflow.set_experiment('Insurence App')
-mlflow.set_tracking_uri('https//:localhost 5000')
 
 for model_name, model in models.items():
     pipeline= Pipeline([
@@ -60,7 +60,7 @@ for model_name, model in models.items():
     pipeline.fit(X_train, y_train)
     y_pred= pipeline.predict(X_test)
 
-    with mlflow.start_run(run_name= 'Insurence App'):
+    with mlflow.start_run(run_name= model_name):
         logger.info('mlflow run has started')
         mae= mean_absolute_error(y_test, y_pred)
         mse= mean_squared_error(y_test, y_pred)
@@ -83,4 +83,4 @@ for model_name, model in models.items():
             best_model_name= model_name
 
 os.makedirs('models', exist_ok= True)
-joblib.load(best_mdoel, 'models/ best_models.pkl')
+joblib.dump(best_mdoel, 'models/best_models.pkl')

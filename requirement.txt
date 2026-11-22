@@ -1,0 +1,34 @@
+
+# Data processing
+pandas
+numpy
+scipy
+
+# Machine Learning
+scikit-learn
+xgboost
+joblib
+
+# MLOps
+mlflow
+dvc
+dvc-s3
+
+# AWS
+boto3
+
+# API
+fastapi
+uvicorn[standard]
+pydantic
+
+# Monitoring
+prometheus-client
+
+# Visualization and analysis
+matplotlib
+seaborn
+
+# Testing
+pytest
+httpx
