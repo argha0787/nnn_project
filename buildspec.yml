@@ -1,0 +1,61 @@
+
+version: 0.2
+
+env:
+  variables:
+    ECR_REPOSITORY: "YOUR_ECR_REPOSITORY"
+    IMAGE_TAG: "latest"
+
+phases:
+
+  install:
+    commands:
+      - echo "Starting ML application build process..."
+      - echo "Checking installed tools..."
+      - docker --version
+      - aws --version
+
+  pre_build:
+    commands:
+      - echo "Authenticating with Amazon ECR..."
+
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+      - ECR_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY}
+
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}
+
+      - if [ -z "$IMAGE_TAG" ]; then IMAGE_TAG="latest"; fi
+
+      - echo "ECR repository: $ECR_URI"
+      - echo "Image tag: $IMAGE_TAG"
+
+  build:
+    commands:
+      - echo "Running ML application tests..."
+
+      - if [ -d tests ]; then python -m pytest tests/ -v; else echo "No tests directory found. Skipping tests."; fi
+
+      - echo "Building Docker image..."
+
+      - docker build -t ${ECR_URI}:${IMAGE_TAG} .
+
+      - docker tag ${ECR_URI}:${IMAGE_TAG} ${ECR_URI}:latest
+
+  post_build:
+    commands:
+      - echo "Pushing Docker image to Amazon ECR..."
+
+      - docker push ${ECR_URI}:${IMAGE_TAG}
+
+      - docker push ${ECR_URI}:latest
+
+      - echo "Docker image successfully pushed to ECR."
+
+artifacts:
+  files:
+    - appspec.yml
+    - scripts/**/*
+  discard-paths: no
